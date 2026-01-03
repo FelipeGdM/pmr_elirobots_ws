@@ -1,0 +1,11 @@
+[
+  {
+    "name": "getServoStatus"
+  },
+  {
+    "name": "set_servo_status",
+    "params": {
+      "status": "String"
+    }
+  }
+]
