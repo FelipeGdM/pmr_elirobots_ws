@@ -1,13 +1,27 @@
-
+// #include <asio.hpp>
+#include <cstdint>
 #include <cstdlib>
-#include <iostream>
-#include <jsonrpccpp/client.h>
-#include <jsonrpccpp/client/connectors/tcpsocketclient.h>
+
+#include <nlohmann/json.hpp>
+
+#include <jsonrpccxx/client.hpp>
+#include <jsonrpccxx/server.hpp>
+
+#include "cpphttplibconnector.hpp"
 
 int main() {
-  std::string host = "127.0.0.1";
-  const uint16_t port = 6543;
+  const std::string host = "127.0.0.1";
+  const uint16_t port = 8080;
 
-  jsonrpc::TcpSocketClient client(host, port);
-  jsonrpc::Client c(client);
+  CppHttpLibClientConnector httpClient(host, port);
+
+  jsonrpccxx::JsonRpcClient client(httpClient, jsonrpccxx::version::v2);
+
+  try {
+    client.CallMethod<uint16_t>(1, "my_method", {});
+  } catch (jsonrpccxx::JsonRpcException &e) {
+    std::cerr << "Error finding product: " << e.what() << "\n";
+  }
+  // jsonrpccxx::JsonRpcClient client(clientConnector, jsonrpccxx::version::v2);
+  return 0;
 }
