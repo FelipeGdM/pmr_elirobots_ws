@@ -5,23 +5,33 @@
 #include <nlohmann/json.hpp>
 
 #include <jsonrpccxx/client.hpp>
-#include <jsonrpccxx/server.hpp>
 
-#include "cpphttplibconnector.hpp"
+#include "eliterobots/robot.hpp"
 
 int main() {
-  const std::string host = "127.0.0.1";
+  const std::string addr = "127.0.0.1";
   const uint16_t port = 8080;
 
-  CppHttpLibClientConnector httpClient(host, port);
+  elite::Robot client(addr, port);
 
-  jsonrpccxx::JsonRpcClient client(httpClient, jsonrpccxx::version::v2);
+  auto retval = client.getServoStatus();
 
-  try {
-    client.CallMethod<uint16_t>(1, "my_method", {});
-  } catch (jsonrpccxx::JsonRpcException &e) {
-    std::cerr << "Error finding product: " << e.what() << "\n";
+  auto suc = std::get<0>(retval);
+  auto value = std::get<1>(retval);
+
+  client.setServoStatus(1);
+
+  auto ret = client.getJointPos();
+
+  auto val = std::get<1>(ret);
+
+  std::cout << "Return: " << std::endl;
+
+  for (auto num : val) {
+    std::cout << num << ", ";
   }
+  std::cout << std::endl;
+
   // jsonrpccxx::JsonRpcClient client(clientConnector, jsonrpccxx::version::v2);
   return 0;
 }
