@@ -13,7 +13,7 @@ namespace elite {
   std::tuple<bool, T> Robot::call_method(const jsonrpccxx::id_type &id, const std::string &name,
                                         const jsonrpccxx::positional_parameter &params) {
     try {
-      auto retval = this->client.call_method<T>(id, name, params);
+      auto retval = this->client.CallMethod<T>(id, name, params);
       return std::make_tuple(true, retval);
     } catch (jsonrpccxx::JsonRpcException &e) {
       return std::make_tuple(false, T{});
@@ -29,7 +29,7 @@ namespace elite {
   std::tuple<bool, T> Robot::call_method_named(const jsonrpccxx::id_type &id, const std::string &name,
                                              const jsonrpccxx::named_parameter &params) {
     try {
-      auto retval = this->client.call_method_named<T>(id, name, params);
+      auto retval = this->client.CallMethodNamed<T>(id, name, params);
       return std::make_tuple(true, retval);
     } catch (jsonrpccxx::JsonRpcException &e) {
       return std::make_tuple(false, T{});

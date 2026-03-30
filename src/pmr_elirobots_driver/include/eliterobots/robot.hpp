@@ -102,9 +102,9 @@ namespace elite {
 
 
   private:
-    CppHttpLibClientConnector httpClient;
-    jsonrpccxx::JsonRpcClient client;
     std::string addr;
     uint16_t port;
+    CppHttpLibClientConnector httpClient;
+    jsonrpccxx::JsonRpcClient client;
   };
 } // namespace elite

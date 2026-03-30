@@ -1,9 +1,7 @@
 cmake_minimum_required(VERSION 3.20)
 project(pmr_elirobots_driver)
 
-if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  add_compile_options(-Wall -Wextra -Wpedantic)
-endif()
+add_compile_options(-Wall -Wextra -Wpedantic)
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
@@ -11,7 +9,24 @@ find_package(ament_cmake REQUIRED)
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)
 
-add_executable(driver src/driver.cpp)
+include_directories(vendor/)
+include_directories(vendor/json-rpc-cxx/include)
+
+include_directories(${CMAKE_BINARY_DIR})
+include_directories(include)
+
+add_subdirectory(vendor/json)
+
+add_executable(driver 
+  src/driver.cpp
+  # src/main.cpp
+  src/robot.cpp
+)
+
+target_link_libraries(driver
+  nlohmann_json::nlohmann_json
+)
+
 target_include_directories(driver PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include/${PROJECT_NAME}>)
