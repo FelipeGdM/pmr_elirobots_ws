@@ -14,14 +14,14 @@ int main() {
 
   elite::Robot client(addr, port);
 
-  auto retval = client.getServoStatus();
+  auto retval = client.get_servo_status();
 
   auto suc = std::get<0>(retval);
   auto value = std::get<1>(retval);
 
-  client.setServoStatus(1);
+  client.set_servo_status(1);
 
-  auto ret = client.getJointPos();
+  auto ret = client.get_joint_pos();
 
   auto val = std::get<1>(ret);
 

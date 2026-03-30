@@ -1,5 +1,6 @@
 #include "eliterobots/robot.hpp"
 #include <cstddef>
+#include <cstdint>
 #include <tuple>
 
 namespace elite {
@@ -9,10 +10,10 @@ namespace elite {
         client(jsonrpccxx::JsonRpcClient(httpClient, jsonrpccxx::version::v2)) {}
 
   template <typename T>
-  std::tuple<bool, T> Robot::CallMethod(const jsonrpccxx::id_type &id, const std::string &name,
+  std::tuple<bool, T> Robot::call_method(const jsonrpccxx::id_type &id, const std::string &name,
                                         const jsonrpccxx::positional_parameter &params) {
     try {
-      auto retval = this->client.CallMethod<T>(id, name, params);
+      auto retval = this->client.call_method<T>(id, name, params);
       return std::make_tuple(true, retval);
     } catch (jsonrpccxx::JsonRpcException &e) {
       return std::make_tuple(false, T{});
@@ -20,51 +21,169 @@ namespace elite {
   }
 
   template <typename T>
-  std::tuple<bool, T> Robot::CallMethod(const jsonrpccxx::id_type &id, const std::string &name) {
-    return this->CallMethod<T>(id, name, {});
+  std::tuple<bool, T> Robot::call_method(const jsonrpccxx::id_type &id, const std::string &name) {
+    return this->call_method<T>(id, name, {});
   }
 
   template <typename T>
-  std::tuple<bool, T> Robot::CallMethodNamed(const jsonrpccxx::id_type &id, const std::string &name,
+  std::tuple<bool, T> Robot::call_method_named(const jsonrpccxx::id_type &id, const std::string &name,
                                              const jsonrpccxx::named_parameter &params) {
     try {
-      auto retval = this->client.CallMethodNamed<T>(id, name, params);
+      auto retval = this->client.call_method_named<T>(id, name, params);
       return std::make_tuple(true, retval);
     } catch (jsonrpccxx::JsonRpcException &e) {
       return std::make_tuple(false, T{});
     }
   };
 
-  std::tuple<bool, bool> Robot::getServoStatus() {
-    return this->CallMethod<bool>(1, "getServoStatus");
+  std::tuple<bool, bool> Robot::get_servo_status() {
+    return this->call_method<bool>(1, "get_servo_status");
   }
 
-  std::tuple<bool, bool> Robot::setServoStatus(uint8_t status) {
+  std::tuple<bool, bool> Robot::set_servo_status(uint8_t status) {
     nlohmann::json params;
     params["status"] = status;
-    return this->CallMethodNamed<bool>(1, "set_servo_status", params);
+    return this->call_method_named<bool>(1, "set_servo_status", params);
   }
 
-  std::tuple<bool, bool> Robot::syncMotorStatus() {
-    return this->CallMethod<bool>(1, "syncMotorStatus");
+  std::tuple<bool, bool> Robot::sync_motor_status() {
+    return this->call_method<bool>(1, "sync_motor_status");
   }
 
-  std::tuple<bool, bool> Robot::clearAlarm() { return this->CallMethod<bool>(1, "clearAlarm"); }
+  std::tuple<bool, bool> Robot::clear_alarm() { return this->call_method<bool>(1, "clear_alarm"); }
 
-  std::tuple<bool, bool> Robot::getMotorStatus() {
-    return this->CallMethod<bool>(1, "getMotorStatus");
+  std::tuple<bool, bool> Robot::get_motor_status() {
+    return this->call_method<bool>(1, "get_motor_status");
   }
 
-  std::tuple<bool, uint8_t> Robot::getRobotState() {
-    return this->CallMethod<uint8_t>(1, "getRobotState");
+  std::tuple<bool, uint8_t> Robot::get_robot_state() {
+    return this->call_method<uint8_t>(1, "get_robot_state");
   };
 
-  std::tuple<bool, uint8_t> Robot::getRobotMode() {
-    return this->CallMethod<uint8_t>(1, "getRobotMode");
+  std::tuple<bool, uint8_t> Robot::get_robot_mode() {
+    return this->call_method<uint8_t>(1, "get_robot_mode");
   };
 
-  std::tuple<bool, std::array<double, 6>> Robot::getJointPos() {
-    return this->CallMethod<std::array<double, 6>>(1, "get_joint_pos");
+  std::tuple<bool, std::array<double, JOINT_COUNT>> Robot::get_joint_pos() {
+    return this->call_method<std::array<double, JOINT_COUNT>>(1, "get_joint_pos");
   };
+
+  bool Robot::robot_servo_on(uint8_t max_retries){
+
+//         if self.mode != BaseEC.RobotMode.REMOTE:
+//             self.logger.error("Please set Robot Mode to remote")
+//             return False
+
+    auto mode_request = this->get_robot_mode();
+
+    if(!std::get<0>(mode_request)){
+      return false;
+    }
+
+    if(std::get<1>(mode_request) != 2){
+      return false;
+    }
+
+//         # Loop to clear alarm, excluding abnormal conditions
+//         clear_alarm_tries = 0
+//         while clear_alarm_tries < max_retries and self.state != BaseEC.RobotState.STOP:
+//             clear_alarm_tries += 1
+//             self.clear_alarm()
+//             time.sleep(0.2)
+
+    bool alarm_ok = false;
+    uint8_t alarm_retries = 0;
+
+    while(!alarm_ok && (alarm_retries < max_retries)){
+      alarm_retries++;
+      auto clear_alarm = this->clear_alarm();
+  
+      if(!std::get<0>(clear_alarm)){
+        return false;
+      }
+
+      alarm_ok = std::get<1>(clear_alarm);
+    }
+
+//         if self.state != BaseEC.RobotState.STOP:
+//             self.logger.error("Alarm cannot be cleared, please check robot state")
+//             return False
+
+    auto state_request = this->get_robot_state();
+
+    if(!std::get<0>(state_request)){
+      return false;
+    }
+
+    if(std::get<1>(state_request) != 2){
+      return false;
+    }
+    
+//         self.logger.debug("Alarm cleared successfully")
+//         time.sleep(0.2)
+
+//         motor_status_tries = 0
+//         while motor_status_tries < max_retries and not self.sync_status:
+//             motor_status_tries += 1
+//             self.sync()
+//             time.sleep(2)
+
+    bool motor_sync = false;
+    auto motor_retries = 0;
+
+    while(!motor_sync && (motor_retries < max_retries)){
+      auto motor_sync_request = this->sync_motor_status();
+
+      if(!std::get<0>(motor_sync_request)){
+        return false;
+      }
+
+      motor_sync = std::get<1>(motor_sync_request);
+    }
+
+    auto motor_status_request = this->get_motor_status();
+  //         if not self.sync_status:
+  //             self.logger.error("MotorStatus sync failed")
+  //             return False
+
+    if(!std::get<0>(motor_status_request) || !std::get<1>(motor_status_request)){
+      return false;
+    }
+
+//         self.logger.debug("MotorStatus synchronized successfully")
+//         time.sleep(0.2)
+
+//         # Loop to servo on
+//         servo_on_tries = 0
+//         while servo_on_tries < max_retries and not self.servo_status:
+//             servo_on_tries += 1
+//             self.set_servo_status()
+//             time.sleep(0.02)
+
+    uint8_t servo_on_retries = 0;
+    bool servo_status = false;
+
+    while(!servo_status && servo_on_retries < max_retries){
+      servo_on_retries++;
+      auto servo_status_request = this->set_servo_status(1);
+
+      if(!std::get<0>(servo_status_request)){
+        return false;
+      }
+
+      servo_status = std::get<1>(servo_status_request);
+    }
+
+//         if not self.servo_status:
+//             self.logger.error("Servo status set failed")
+//             return False
+
+//         self.logger.debug("Servo status set successfully")
+//         return True
+
+    return true;
+
+  };
+
 
 } // namespace elite
