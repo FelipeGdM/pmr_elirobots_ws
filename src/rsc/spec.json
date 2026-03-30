@@ -1,6 +1,6 @@
 [
   {
-    "name": "getServoStatus"
+    "name": "get_servo_status"
   },
   {
     "name": "set_servo_status",
