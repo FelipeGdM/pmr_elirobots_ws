@@ -1,9 +1,9 @@
 [submodule "src/vendor/json-rpc-cxx"]
-	path = src/vendor/json-rpc-cxx
+	path = src/pmr_elirobots_driver/vendor/json-rpc-cxx
 	url = https://github.com/jsonrpcx/json-rpc-cxx.git
 [submodule "src/vendor/json"]
-	path = src/vendor/json
+	path = src/pmr_elirobots_driver/vendor/json
 	url = https://github.com/nlohmann/json.git
 [submodule "src/vendor/cpp-httplib"]
-	path = src/vendor/cpp-httplib
+	path = src/pmr_elirobots_driver/vendor/cpp-httplib
 	url = https://github.com/yhirose/cpp-httplib.git

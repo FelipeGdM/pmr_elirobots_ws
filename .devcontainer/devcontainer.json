@@ -17,24 +17,25 @@
                 "ms-vscode.cpptools-themes",
                 "twxs.cmake",
                 "donjayamanne.python-extension-pack",
-                "eamodio.gitlens",
+                // "eamodio.gitlens",
                 "ranch-hand-robotics.rde-ros-2",
                 // "ms-iot.vscode-ros"
             ]
         }
     },
     "containerEnv": {
-        "DISPLAY": "unix:0",
+        "DISPLAY": "${env:DISPLAY}",
+        "XAUTHORITY": "/tmp/.Xauthority",
         "ROS_AUTOMATIC_DISCOVERY_RANGE": "LOCALHOST",
         "ROS_DOMAIN_ID": "42"
     },
     "runArgs": [
         "--net=host",
         "--pid=host",
-        "--ipc=host",
-        "-e", "DISPLAY=${env:DISPLAY}"
+        "--ipc=host"
     ],
     "mounts": [
+       "source=${env:XAUTHORITY},target=/tmp/.Xauthority,type=bind,consistency=cached",
        "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind,consistency=cached",
        "source=/dev/dri,target=/dev/dri,type=bind,consistency=cached"
     ],
