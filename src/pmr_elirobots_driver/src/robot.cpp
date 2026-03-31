@@ -14,12 +14,14 @@ namespace elite {
   std::tuple<bool, T> Robot::call_method(const jsonrpccxx::id_type &id, const std::string &name,
                                          const jsonrpccxx::positional_parameter &params) {
     try {
-      auto retval = this->client.CallMethod<T>(id, name, params);
-      return std::make_tuple(true, retval);
+      auto request = this->client.CallMethod<std::string>(id, name, params);
+      auto result = nlohmann::json::parse(request);
+
+      return {true, result.template get<T>()};
     } catch (jsonrpccxx::JsonRpcException &e) {
       std::cout << "Bad vibes\n";
       std::cout << e.Message() << "\n";
-      return std::make_tuple(false, T{});
+      return {false, T{}};
     }
   }
 
@@ -50,48 +52,25 @@ namespace elite {
   }
 
   std::tuple<bool, bool> Robot::sync_motor_status() {
-    auto request = this->call_method<std::string>(1, "syncMotorStatus");
-    auto valid = std::get<bool>(request);
-
-    return {valid, std::get<std::string>(request) == "true"};
+    return this->call_method<bool>(1, "syncMotorStatus");
   }
 
-  std::tuple<bool, bool> Robot::clear_alarm() {
-    auto request = this->call_method<std::string>(1, "clearAlarm");
-    auto valid = std::get<bool>(request);
-
-    return {valid, std::get<std::string>(request) == "true"};
-  }
+  std::tuple<bool, bool> Robot::clear_alarm() { return this->call_method<bool>(1, "clearAlarm"); }
 
   std::tuple<bool, bool> Robot::get_motor_status() {
-    auto request = this->call_method<std::string>(1, "getMotorStatus");
-    auto valid = std::get<bool>(request);
-
-    return {valid, std::get<std::string>(request) == "true"};
+    return this->call_method<bool>(1, "getMotorStatus");
   }
 
   std::tuple<bool, uint8_t> Robot::get_robot_state() {
-    auto request = this->call_method<std::string>(1, "getRobotState");
-    auto valid = std::get<bool>(request);
-
-    return {valid, std::stoi(std::get<std::string>(request))};
+    return this->call_method<uint8_t>(1, "getRobotState");
   };
 
   std::tuple<bool, uint16_t> Robot::get_robot_mode() {
-    auto request = this->call_method<std::string>(1, "getRobotMode");
-    auto valid = std::get<bool>(request);
-
-    return {valid, std::stoi(std::get<std::string>(request))};
+    return this->call_method<uint16_t>(1, "getRobotMode");
   };
 
   std::tuple<bool, std::array<double, JOINT_COUNT>> Robot::get_joint_pos() {
-
-    auto request = this->call_method<std::string>(1, "get_joint_pos");
-    auto valid = std::get<bool>(request);
-
-    auto result = nlohmann::json::parse(std::get<std::string>(request));
-
-    return {valid, result.get<std::array<double, JOINT_COUNT>>()};
+    return this->call_method<std::array<double, JOINT_COUNT>>(1, "get_joint_pos");
   };
 
   bool Robot::robot_servo_on(uint8_t max_retries) {
