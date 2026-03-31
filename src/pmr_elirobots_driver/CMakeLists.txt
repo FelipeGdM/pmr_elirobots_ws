@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.20)
 project(pmr_elirobots_driver)
 
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 add_compile_options(-Wall -Wextra -Wpedantic)
 
 # find dependencies
@@ -18,8 +21,8 @@ include_directories(include)
 add_subdirectory(vendor/json)
 
 add_executable(driver 
-  src/driver.cpp
-  # src/main.cpp
+  # src/driver.cpp
+  src/main.cpp
   src/robot.cpp
 )
 

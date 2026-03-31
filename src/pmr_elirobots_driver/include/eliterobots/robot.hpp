@@ -1,5 +1,6 @@
 #pragma once
 #include "cpphttplibconnector.hpp"
+#include "boost_aio_socket_connector.hpp"
 #include <jsonrpccxx/client.hpp>
 
 #include <cstdint>
@@ -14,10 +15,10 @@ namespace elite {
 
     template <typename T>
     std::tuple<bool, T> call_method(const jsonrpccxx::id_type &id, const std::string &name,
-                                   const jsonrpccxx::positional_parameter &params);
+                                   const jsonrpccxx::positional_parameter &params = {});
 
-    template <typename T>
-    std::tuple<bool, T> call_method(const jsonrpccxx::id_type &id, const std::string &name);
+    // template <typename T>
+    // std::tuple<bool, T> call_method(const jsonrpccxx::id_type &id, const std::string &name);
 
     template <typename T>
     std::tuple<bool, T> call_method_named(const jsonrpccxx::id_type &id, const std::string &name,
@@ -84,7 +85,7 @@ namespace elite {
      *
      * @return Teaching mode 0, operating mode 1, remote mode 2
      */
-    std::tuple<bool, uint8_t> get_robot_mode();
+    std::tuple<bool, uint16_t> get_robot_mode();
 
     /**
      * @brief 2.2.2.3. Obtain the joint position information of the robot
@@ -104,7 +105,7 @@ namespace elite {
   private:
     std::string addr;
     uint16_t port;
-    CppHttpLibClientConnector httpClient;
+    BoostAioClientConnector httpClient;
     jsonrpccxx::JsonRpcClient client;
   };
 } // namespace elite

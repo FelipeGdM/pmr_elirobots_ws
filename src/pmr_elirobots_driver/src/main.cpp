@@ -2,6 +2,9 @@
 #include <cstdint>
 #include <cstdlib>
 
+#include <ostream>
+#include <string>
+
 #include <nlohmann/json.hpp>
 
 #include <jsonrpccxx/client.hpp>
@@ -9,28 +12,36 @@
 #include "eliterobots/robot.hpp"
 
 int main() {
-  const std::string addr = "127.0.0.1";
-  const uint16_t port = 8080;
+
+  std::cout << "Les goo\n";
+
+  const std::string addr = "192.168.1.202";
+  const uint16_t port = 8055;
 
   elite::Robot client(addr, port);
 
-  auto retval = client.get_servo_status();
+  auto retval1 = client.robot_servo_on();
+  std::cout << "Servo on: " << (retval1 ? "True" : "False") << "\n";
 
-  auto suc = std::get<0>(retval);
-  auto value = std::get<1>(retval);
+  // auto retval = client.get_servo_status();
 
-  client.set_servo_status(1);
+  // auto suc = std::get<0>(retval);
+  // auto value = std::get<1>(retval);
 
-  auto ret = client.get_joint_pos();
+  // std::cout << "Success: " << suc << " Value: " << value << "\n";
 
-  auto val = std::get<1>(ret);
+  // client.set_servo_status(1);
 
-  std::cout << "Return: " << std::endl;
+  // auto ret = client.get_joint_pos();
 
-  for (auto num : val) {
-    std::cout << num << ", ";
-  }
-  std::cout << std::endl;
+  // auto val = std::get<1>(ret);
+
+  // std::cout << "Return: " << "\n";
+
+  // for (auto num : val) {
+  //   std::cout << num << ", ";
+  // }
+  // std::cout << "\n";
 
   // jsonrpccxx::JsonRpcClient client(clientConnector, jsonrpccxx::version::v2);
   return 0;

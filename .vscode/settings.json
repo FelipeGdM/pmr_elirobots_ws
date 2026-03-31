@@ -5,5 +5,8 @@
     ],
     "python.analysis.extraPaths": [
         "/opt/ros/rolling/lib/python3.12/site-packages"
-    ]
+    ],
+    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+    "cmake.sourceDirectory": "/home/ws/src/pmr_elirobots_driver",
+    "editor.formatOnSave": true
 }

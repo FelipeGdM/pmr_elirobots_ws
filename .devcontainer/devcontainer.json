@@ -15,10 +15,12 @@
             "extensions":[
                 "ms-vscode.cpptools",
                 "ms-vscode.cpptools-themes",
-                "twxs.cmake",
+                "llvm-vs-code-extensions.vscode-clangd",
                 "donjayamanne.python-extension-pack",
+                "ms-vscode.cmake-tools",
+                "redhat.vscode-yaml",
                 // "eamodio.gitlens",
-                "ranch-hand-robotics.rde-ros-2",
+                "ranch-hand-robotics.rde-ros-2"
                 // "ms-iot.vscode-ros"
             ]
         }
