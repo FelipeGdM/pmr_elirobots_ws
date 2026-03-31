@@ -1,5 +1,5 @@
 #include "eliterobots/robot.hpp"
-#include <cstddef>
+#include <boost/asio.hpp>
 #include <cstdint>
 #include <string>
 #include <tuple>
@@ -22,12 +22,6 @@ namespace elite {
       return std::make_tuple(false, T{});
     }
   }
-
-  // template <typename T>
-  // std::tuple<bool, T> Robot::call_method(const jsonrpccxx::id_type &id, const std::string &name)
-  // {
-  //   return this->call_method<T>(id, name, {});
-  // }
 
   template <typename T>
   std::tuple<bool, T> Robot::call_method_named(const jsonrpccxx::id_type &id,
@@ -91,14 +85,16 @@ namespace elite {
   };
 
   std::tuple<bool, std::array<double, JOINT_COUNT>> Robot::get_joint_pos() {
-    return this->call_method<std::array<double, JOINT_COUNT>>(1, "get_joint_pos");
+
+    auto request = this->call_method<std::string>(1, "get_joint_pos");
+    auto valid = std::get<bool>(request);
+
+    auto result = nlohmann::json::parse(std::get<std::string>(request));
+
+    return {valid, result.get<std::array<double, JOINT_COUNT>>()};
   };
 
   bool Robot::robot_servo_on(uint8_t max_retries) {
-
-    //         if self.mode != BaseEC.RobotMode.REMOTE:
-    //             self.logger.error("Please set Robot Mode to remote")
-    //             return False
 
     auto mode_request = this->get_robot_mode();
 
@@ -116,13 +112,6 @@ namespace elite {
       return false;
     }
 
-    //         # Loop to clear alarm, excluding abnormal conditions
-    //         clear_alarm_tries = 0
-    //         while clear_alarm_tries < max_retries and self.state != BaseEC.RobotState.STOP:
-    //             clear_alarm_tries += 1
-    //             self.clear_alarm()
-    //             time.sleep(0.2)
-
     bool alarm_ok = false;
     uint8_t alarm_retries = 0;
 
@@ -137,10 +126,6 @@ namespace elite {
       alarm_ok = std::get<1>(clear_alarm);
     }
 
-    //         if self.state != BaseEC.RobotState.STOP:
-    //             self.logger.error("Alarm cannot be cleared, please check robot state")
-    //             return False
-
     auto state_request = this->get_robot_state();
 
     if (!std::get<0>(state_request)) {
@@ -151,46 +136,30 @@ namespace elite {
       return false;
     }
 
-    //         self.logger.debug("Alarm cleared successfully")
-    //         time.sleep(0.2)
-
-    //         motor_status_tries = 0
-    //         while motor_status_tries < max_retries and not self.sync_status:
-    //             motor_status_tries += 1
-    //             self.sync()
-    //             time.sleep(2)
-
     bool motor_sync = false;
     auto motor_retries = 0;
 
     while (!motor_sync && (motor_retries < max_retries)) {
+      motor_retries += 1;
       auto motor_sync_request = this->sync_motor_status();
 
-      if (!std::get<0>(motor_sync_request)) {
-        return false;
-      }
-
       motor_sync = std::get<1>(motor_sync_request);
+
+      if (!motor_sync) {
+        boost::asio::io_context io_ctx;
+        boost::asio::steady_timer timer(io_ctx, std::chrono::seconds(5));
+        timer.wait(); // blocks for 5 seconds
+      }
     }
 
+    if (!motor_sync)
+      return false;
+
     auto motor_status_request = this->get_motor_status();
-    //         if not self.sync_status:
-    //             self.logger.error("MotorStatus sync failed")
-    //             return False
 
     if (!std::get<0>(motor_status_request) || !std::get<1>(motor_status_request)) {
       return false;
     }
-
-    //         self.logger.debug("MotorStatus synchronized successfully")
-    //         time.sleep(0.2)
-
-    //         # Loop to servo on
-    //         servo_on_tries = 0
-    //         while servo_on_tries < max_retries and not self.servo_status:
-    //             servo_on_tries += 1
-    //             self.set_servo_status()
-    //             time.sleep(0.02)
 
     uint8_t servo_on_retries = 0;
     bool servo_status = false;
@@ -205,13 +174,6 @@ namespace elite {
 
       servo_status = std::get<1>(servo_status_request);
     }
-
-    //         if not self.servo_status:
-    //             self.logger.error("Servo status set failed")
-    //             return False
-
-    //         self.logger.debug("Servo status set successfully")
-    //         return True
 
     return true;
   };
