@@ -6,14 +6,11 @@
 
 namespace elite {
 
-  Robot::Robot(const std::string &addr, uint16_t port)
-      : addr(addr), port(port), httpClient{addr, port},
-        client(jsonrpccxx::JsonRpcClient(httpClient, jsonrpccxx::version::v2)) {}
-
   template <typename T>
   std::tuple<bool, T> Robot::call_method(const jsonrpccxx::id_type &id, const std::string &name,
                                          const jsonrpccxx::positional_parameter &params) {
     try {
+      std::cout << "call method\n";
       auto request = this->client.CallMethod<std::string>(id, name, params);
       auto result = nlohmann::json::parse(request);
 
@@ -30,10 +27,12 @@ namespace elite {
                                                const std::string &name,
                                                const jsonrpccxx::named_parameter &params) {
     try {
-      auto retval = this->client.CallMethodNamed<T>(id, name, params);
-      return std::make_tuple(true, retval);
+      auto request = this->client.CallMethodNamed<std::string>(id, name, params);
+      auto result = nlohmann::json::parse(request);
+
+      return {true, result.template get<T>()};
     } catch (jsonrpccxx::JsonRpcException &e) {
-      return std::make_tuple(false, T{});
+      return {false, T{}};
     }
   };
 
@@ -45,10 +44,7 @@ namespace elite {
     nlohmann::json params;
     params["status"] = status;
 
-    auto request = this->call_method_named<std::string>(1, "set_servo_status", params);
-    auto valid = std::get<bool>(request);
-
-    return {valid, std::get<std::string>(request) == "true"};
+    return this->call_method_named<bool>(1, "set_servo_status", params);
   }
 
   std::tuple<bool, bool> Robot::sync_motor_status() {
@@ -72,6 +68,33 @@ namespace elite {
   std::tuple<bool, std::array<double, JOINT_COUNT>> Robot::get_joint_pos() {
     return this->call_method<std::array<double, JOINT_COUNT>>(1, "get_joint_pos");
   };
+
+  std::tuple<bool, bool> Robot::move_by_joint(const std::array<float, JOINT_COUNT> &target_pos,
+                                              MovementConfig &config) {
+
+    nlohmann::json params;
+    params["targetPos"] = target_pos;
+
+    if (config.speed != 0.0)
+      params["speed"] = config.speed;
+
+    if (config.cond_type != -1)
+      params["cond_type"] = config.cond_type;
+
+    if (config.cond_num != -1)
+      params["cond_num"] = config.cond_num;
+
+    if (config.cond_value != -1)
+      params["cond_value"] = config.cond_value;
+
+    if (config.acc != -1)
+      params["acc"] = config.acc;
+
+    if (config.dec != -1)
+      params["dec"] = config.dec;
+
+    return this->call_method_named<bool>(1, "moveByJoint", params);
+  }
 
   bool Robot::robot_servo_on(uint8_t max_retries) {
 
@@ -155,6 +178,15 @@ namespace elite {
     }
 
     return true;
+  };
+
+  bool Robot::is_alive() {
+    if (!this->connector.isAlive())
+      return false;
+
+    auto request = this->get_robot_state();
+
+    return std::get<0>(request);
   };
 
 } // namespace elite

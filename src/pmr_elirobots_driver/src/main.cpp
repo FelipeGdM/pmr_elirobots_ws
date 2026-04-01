@@ -11,6 +11,9 @@
 
 #include "eliterobots/robot.hpp"
 
+const std::array<float, 6> home = {95.8199, -105.599, 131.866, -115.199, 90.0012, -61.1451};
+const std::array<float, 6> pos = {0, 0, 0, -0, 0, 0};
+
 int main() {
 
   std::cout << "Les goo\n";
@@ -23,25 +26,21 @@ int main() {
   auto retval1 = client.robot_servo_on();
   std::cout << "Servo on: " << (retval1 ? "True" : "False") << "\n";
 
-  // auto retval = client.get_servo_status();
+  auto ret = client.get_joint_pos();
 
-  // auto suc = std::get<0>(retval);
-  // auto value = std::get<1>(retval);
+  auto val = std::get<1>(ret);
 
-  // std::cout << "Success: " << suc << " Value: " << value << "\n";
+  std::cout << "Return: " << "\n";
 
-  // client.set_servo_status(1);
+  for (auto num : val) {
+    std::cout << num << ", ";
+  }
+  std::cout << "\n";
 
-  // auto ret = client.get_joint_pos();
+  elite::MovementConfig config;
 
-  // auto val = std::get<1>(ret);
-
-  // std::cout << "Return: " << "\n";
-
-  // for (auto num : val) {
-  //   std::cout << num << ", ";
-  // }
-  // std::cout << "\n";
+  client.move_by_joint(home, config);
+  client.move_by_joint(pos, config);
 
   // jsonrpccxx::JsonRpcClient client(clientConnector, jsonrpccxx::version::v2);
   return 0;

@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.20)
-project(pmr_elirobots_driver)
+project(pmr_elirobots_driver CXX)
+
+set(CMAKE_BUILD_TYPE Debug)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -8,6 +10,8 @@ add_compile_options(-Wall -Wextra -Wpedantic)
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(std_msgs REQUIRED)
 # uncomment the following section in order to fill in
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)
@@ -20,22 +24,40 @@ include_directories(include)
 
 add_subdirectory(vendor/json)
 
-add_executable(driver 
-  # src/driver.cpp
-  src/main.cpp
+add_library(robot
   src/robot.cpp
 )
 
-target_link_libraries(driver
+add_executable(main
+  src/main.cpp
+)
+
+add_executable(driver 
+  src/driver.cpp
+)
+
+target_link_libraries(robot
   nlohmann_json::nlohmann_json
 )
 
-target_include_directories(driver PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include/${PROJECT_NAME}>)
-target_compile_features(driver PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
+target_link_libraries(main
+  robot
+)
 
-install(TARGETS driver
+target_link_libraries(driver
+  robot
+  rclcpp::rclcpp
+  ${std_msgs_TARGETS}
+)
+
+target_include_directories(robot PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include/${PROJECT_NAME}>
+)
+
+# target_compile_features(driver PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
+
+install(TARGETS driver main robot
   DESTINATION lib/${PROJECT_NAME})
 
 if(BUILD_TESTING)
