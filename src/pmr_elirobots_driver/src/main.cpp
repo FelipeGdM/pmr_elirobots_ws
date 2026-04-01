@@ -12,7 +12,7 @@
 #include "eliterobots/robot.hpp"
 
 const std::array<float, 6> home = {95.8199, -105.599, 131.866, -115.199, 90.0012, -61.1451};
-const std::array<float, 6> pos = {0, 0, 0, -0, 0, 0};
+const std::array<float, 6> pos = {180, 0, 0, -0, 0, 0};
 
 int main() {
 
@@ -37,9 +37,16 @@ int main() {
   }
   std::cout << "\n";
 
-  elite::MovementConfig config;
+  elite::MovementConfig config = {
+      .speed = 10,
+  };
 
   client.move_by_joint(home, config);
+
+  boost::asio::io_context io_ctx;
+  boost::asio::steady_timer timer(io_ctx, std::chrono::seconds(60));
+  timer.wait();
+
   client.move_by_joint(pos, config);
 
   // jsonrpccxx::JsonRpcClient client(clientConnector, jsonrpccxx::version::v2);
