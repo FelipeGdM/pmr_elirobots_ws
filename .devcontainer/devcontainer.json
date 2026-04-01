@@ -12,16 +12,12 @@
     "workspaceMount": "source=${localWorkspaceFolder},target=/home/ws,type=bind",
     "customizations": {
         "vscode": {
-            "extensions":[
-                "ms-vscode.cpptools",
-                "ms-vscode.cpptools-themes",
+            "extensions": [
                 "llvm-vs-code-extensions.vscode-clangd",
                 "donjayamanne.python-extension-pack",
                 "ms-vscode.cmake-tools",
                 "redhat.vscode-yaml",
-                // "eamodio.gitlens",
                 "ranch-hand-robotics.rde-ros-2"
-                // "ms-iot.vscode-ros"
             ]
         }
     },
@@ -37,9 +33,9 @@
         "--ipc=host"
     ],
     "mounts": [
-       "source=${env:XAUTHORITY},target=/tmp/.Xauthority,type=bind,consistency=cached",
-       "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind,consistency=cached",
-       "source=/dev/dri,target=/dev/dri,type=bind,consistency=cached"
+        "source=${env:XAUTHORITY},target=/tmp/.Xauthority,type=bind,consistency=cached",
+        "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind,consistency=cached",
+        "source=/dev/dri,target=/dev/dri,type=bind,consistency=cached"
     ],
     "postCreateCommand": "sudo rosdep update && sudo rosdep install --from-paths src --ignore-src -y && sudo chown -R $(whoami) /home/ws/"
 }
