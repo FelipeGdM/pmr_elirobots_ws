@@ -2,4 +2,6 @@ build/
 log/
 install/
 
+*.pt
 *.db*
+*.pyc
