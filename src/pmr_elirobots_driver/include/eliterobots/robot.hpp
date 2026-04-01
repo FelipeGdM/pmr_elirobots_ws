@@ -151,7 +151,7 @@ namespace elite {
      * @return std::tuple<bool, bool>
      */
     std::tuple<bool, bool> move_by_joint(const std::array<float, JOINT_COUNT> &target_pos,
-                                         MovementConfig &config);
+                                         MovementConfig config);
 
     /**
      * @brief 3.2. Linear Motion

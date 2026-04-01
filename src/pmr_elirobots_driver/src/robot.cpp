@@ -70,7 +70,7 @@ namespace elite {
   };
 
   std::tuple<bool, bool> Robot::move_by_joint(const std::array<float, JOINT_COUNT> &target_pos,
-                                              MovementConfig &config) {
+                                              MovementConfig config) {
 
     nlohmann::json params;
     params["targetPos"] = target_pos;
