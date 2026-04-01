@@ -15,6 +15,7 @@ find_package(rclcpp_action REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(control_msgs REQUIRED)
 find_package(trajectory_msgs REQUIRED)
+find_package(sensor_msgs REQUIRED)
 # uncomment the following section in order to fill in
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)
@@ -54,6 +55,7 @@ target_link_libraries(driver
   ${std_msgs_TARGETS}
   ${control_msgs_TARGETS}
   ${trajectory_msgs_TARGETS}
+  ${sensor_msgs_TARGETS}
 )
 
 target_include_directories(robot PUBLIC

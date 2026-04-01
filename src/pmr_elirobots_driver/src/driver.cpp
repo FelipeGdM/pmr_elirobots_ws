@@ -10,9 +10,11 @@
 #include <optional>
 #include <rclcpp/qos.hpp>
 #include <rclcpp/utilities.hpp>
+#include <sensor_msgs/msg/joint_state.hpp>
 #include <string>
 
 #include "eliterobots/robot.hpp"
+#include "sensor_msgs/msg/joint_state.hpp"
 #include "std_msgs/msg/bool.hpp"
 
 using namespace std::chrono_literals;
@@ -32,11 +34,29 @@ public:
 
     robot.emplace(robot_addr, port);
 
-    publisher_ = this->create_publisher<std_msgs::msg::Bool>("alive", rclcpp::SystemDefaultsQoS());
+    robot->robot_servo_on();
+
+    is_alive_publisher_ =
+        this->create_publisher<std_msgs::msg::Bool>("alive", rclcpp::SystemDefaultsQoS());
+
+    joint_state_publisher_ = this->create_publisher<sensor_msgs::msg::JointState>(
+        "joint_state", rclcpp::SystemDefaultsQoS());
+
     auto timer_callback = [this]() -> void {
-      auto message = std_msgs::msg::Bool();
-      message.data = true; // this->robot->is_alive();
-      this->publisher_->publish(message);
+      auto request = this->robot->get_joint_pos();
+      auto is_alive_message = std_msgs::msg::Bool();
+      is_alive_message.data = std::get<0>(request);
+
+      const auto &joint_pos = std::get<1>(request);
+
+      auto state_message = sensor_msgs::msg::JointState();
+
+      state_message.header.stamp = this->now();
+      state_message.name = {"joint1", "joint2", "joint3", "joint4", "joint5", "joint6"};
+      state_message.position.assign(std::begin(joint_pos), std::end(joint_pos));
+
+      this->is_alive_publisher_->publish(is_alive_message);
+      this->joint_state_publisher_->publish(state_message);
     };
 
     timer_ = this->create_wall_timer(1000ms, timer_callback);
@@ -69,7 +89,8 @@ public:
 private:
   uint16_t loop_rate_hz;
   rclcpp::TimerBase::SharedPtr timer_;
-  rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr publisher_;
+  rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr is_alive_publisher_;
+  rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr joint_state_publisher_;
   rclcpp_action::Server<FollowJointTrajectory>::SharedPtr action_server_;
 
   std::optional<elite::Robot> robot;
