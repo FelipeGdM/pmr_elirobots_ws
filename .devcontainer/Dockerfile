@@ -25,7 +25,9 @@ RUN apt-get install -y python3-pip \
     libboost-all-dev \
     gdb \
     ros-rolling-control-msgs \
-    ros-rolling-trajectory-msgs
+    ros-rolling-trajectory-msgs 
+
+RUN python3 -m pip install --break-system-packages torch roboticstoolbox-python
 
 ENV SHELL /bin/bash
 
