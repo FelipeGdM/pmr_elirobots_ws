@@ -17,8 +17,16 @@ RUN groupadd --gid $USER_GID $USERNAME \
     && chmod 0440 /etc/sudoers.d/$USERNAME
 
 RUN echo "source /opt/ros/rolling/setup.bash" >> /home/$USERNAME/.bashrc
+
 RUN apt-get update && apt-get upgrade -y
-RUN apt-get install -y python3-pip clangd libboost-all-dev gdb
+
+RUN apt-get install -y python3-pip \
+    clangd \
+    libboost-all-dev \
+    gdb \
+    ros-rolling-control-msgs \
+    ros-rolling-trajectory-msgs
+
 ENV SHELL /bin/bash
 
 # ********************************************************
