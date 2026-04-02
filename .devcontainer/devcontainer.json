@@ -1,5 +1,5 @@
 {
-    "name": "ROS 2 Development Container",
+    "name": "ROS 2 Rolling",
     "privileged": true,
     "remoteUser": "rosbot",
     "build": {
@@ -17,7 +17,13 @@
                 "donjayamanne.python-extension-pack",
                 "ms-vscode.cmake-tools",
                 "redhat.vscode-yaml",
-                "ranch-hand-robotics.rde-ros-2"
+                "ranch-hand-robotics.rde-ros-2",
+                "detachhead.basedpyright",
+                "xaver.clang-format",
+                "charliermarsh.ruff",
+                "redhat.vscode-xml",
+                "tamasfe.even-better-toml",
+                "ms-azuretools.vscode-containers"
             ]
         }
     },
