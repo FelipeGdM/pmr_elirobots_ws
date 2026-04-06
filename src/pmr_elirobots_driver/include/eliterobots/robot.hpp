@@ -1,6 +1,7 @@
 #pragma once
 #include "boost_aio_socket_connector.hpp"
 #include "cpphttplibconnector.hpp"
+#include <chrono>
 #include <jsonrpccxx/client.hpp>
 
 #include <cstdint>
@@ -109,7 +110,23 @@ namespace elite {
      * X.Y.Z. Helper functions
      */
 
+    /**
+     * @brief Performs basic operations to start the robot, such as sync motors and clear alarms
+     *
+     * This function should be called right after stabilishing connection
+     *
+     * @param max_retries How many retries for each operation
+     */
     bool robot_servo_on(uint8_t max_retries = 3);
+
+    /**
+     * @brief Stops the program until the robot goes to stop state
+     *
+     * @param pool_period
+     * @param timeout
+     */
+    bool wait_robot_stop(std::chrono::milliseconds pool_period = std::chrono::milliseconds(200),
+                         std::chrono::seconds timeout = std::chrono::seconds(60));
 
     bool is_alive();
 
@@ -159,6 +176,27 @@ namespace elite {
      * @return std::tuple<bool, bool>
      */
     std::tuple<bool, bool> move_by_line();
+
+    /**
+     * @brief 3.9. Stop robot operation
+     *
+     * @return True for success, false for failure
+     */
+    std::tuple<bool, bool> stop();
+
+    /**
+     * @brief 3.10. Robot runs automatically
+     *
+     * @return True for success, false for failure
+     */
+    std::tuple<bool, bool> run();
+
+    /**
+     * @brief 3.11. Robot stop
+     *
+     * @return True for success, false for failure
+     */
+    std::tuple<bool, bool> pause();
 
   private:
     std::string addr;

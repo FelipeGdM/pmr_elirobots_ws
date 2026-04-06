@@ -1,7 +1,10 @@
 #include "eliterobots/robot.hpp"
 #include <boost/asio.hpp>
+#include <chrono>
+#include <cmath>
 #include <cstdint>
 #include <string>
+#include <thread>
 #include <tuple>
 
 namespace elite {
@@ -96,6 +99,12 @@ namespace elite {
     return this->call_method_named<bool>(1, "moveByJoint", params);
   }
 
+  std::tuple<bool, bool> Robot::stop() { return this->call_method<bool>(1, "stop"); }
+
+  std::tuple<bool, bool> Robot::run() { return this->call_method<bool>(1, "run"); }
+
+  std::tuple<bool, bool> Robot::pause() { return this->call_method<bool>(1, "pause"); }
+
   bool Robot::robot_servo_on(uint8_t max_retries) {
 
     auto mode_request = this->get_robot_mode();
@@ -178,6 +187,25 @@ namespace elite {
     }
 
     return true;
+  };
+
+  bool Robot::wait_robot_stop(std::chrono::milliseconds pool_period, std::chrono::seconds timeout) {
+
+    auto max_retries = (uint16_t)std::ceil(timeout / pool_period);
+
+    for (uint16_t tries = 0; tries < max_retries; tries++) {
+
+      auto state_request = this->get_robot_state();
+
+      auto suc = std::get<bool>(state_request);
+      auto state = std::get<uint8_t>(state_request);
+      if (suc && (state == 0))
+        return true;
+
+      std::this_thread::sleep_for(pool_period);
+    }
+
+    return false;
   };
 
   bool Robot::is_alive() {
