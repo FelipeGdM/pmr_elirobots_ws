@@ -1,5 +1,5 @@
 {
-    "name": "ROS 2 Rolling",
+    "name": "ROS 2 WSL",
     "privileged": true,
     "remoteUser": "rosbot",
     "build": {
@@ -28,8 +28,6 @@
         }
     },
     "containerEnv": {
-        "DISPLAY": "${env:DISPLAY}",
-        "XAUTHORITY": "/tmp/.Xauthority",
         "ROS_AUTOMATIC_DISCOVERY_RANGE": "LOCALHOST",
         "ROS_DOMAIN_ID": "42"
     },
@@ -37,11 +35,6 @@
         "--net=host",
         "--pid=host",
         "--ipc=host"
-    ],
-    "mounts": [
-        "source=${env:XAUTHORITY},target=/tmp/.Xauthority,type=bind,consistency=cached",
-        "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind,consistency=cached",
-        "source=/dev/dri,target=/dev/dri,type=bind,consistency=cached"
     ],
     "postCreateCommand": "sudo rosdep update && sudo rosdep install --from-paths src --ignore-src -y && sudo chown -R $(whoami) /home/ws/"
 }
