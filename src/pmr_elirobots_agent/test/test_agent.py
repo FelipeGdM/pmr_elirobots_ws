@@ -1,3 +1,4 @@
+import numpy as np
 import pytest
 import torch
 from pmr_elirobots_agent.agent import (
@@ -52,6 +53,26 @@ def test_tcp(robot: DHRobot):
     diff = expected_tcp_pose[:3] - tcp_pose[:3]
 
     assert torch.linalg.vector_norm(diff) < 1e-3  # pyright: ignore[reportUnknownMemberType]
+
+
+def test_agent(agent: Agent):
+
+    qpos_ = np.array(
+        [
+            0.0,
+            -7 * np.pi / 8,
+            5 * np.pi / 8,
+            -2 * np.pi / 8,
+            4 * np.pi / 8,
+            0,
+            0,
+            0,
+        ]
+    )
+
+    action = agent.get_action_from_qpos(qpos_)
+
+    assert action is None
 
 
 # def test_agent_action(agent: Agent):

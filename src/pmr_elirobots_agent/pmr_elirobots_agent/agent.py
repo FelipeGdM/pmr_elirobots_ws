@@ -48,7 +48,7 @@ def create_ec63_robot() -> DHRobot:
         RevoluteDH(d=0.0000, a=0.256, alpha=0.0, qlim=partial_spin),
         RevoluteDH(d=0.1035, a=0.000, alpha=-np.pi / 2, qlim=full_spin),
         RevoluteDH(d=0.0980, a=0.000, alpha=-np.pi / 2, qlim=full_spin),
-        # 0.0890 -> due to claw
+        # 0.0890 -> increase due to claw
         RevoluteDH(d=0.1980, a=0.000, alpha=0.0, qlim=full_spin),
     ]
 
