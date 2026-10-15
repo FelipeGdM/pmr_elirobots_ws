@@ -8,8 +8,8 @@
             "USERNAME": "rosbot"
         }
     },
-    "workspaceFolder": "/home/ws",
-    "workspaceMount": "source=${localWorkspaceFolder},target=/home/ws,type=bind",
+    "workspaceFolder": "/home/rosbot/ws",
+    "workspaceMount": "source=${localWorkspaceFolder},target=/home/rosbot/ws,type=bind",
     "customizations": {
         "vscode": {
             "extensions": [
@@ -23,7 +23,7 @@
                 "charliermarsh.ruff",
                 "redhat.vscode-xml",
                 "tamasfe.even-better-toml",
-                "ms-azuretools.vscode-containers"
+                "Ranch-Hand-Robotics.rde-ros-2"
             ]
         }
     },
