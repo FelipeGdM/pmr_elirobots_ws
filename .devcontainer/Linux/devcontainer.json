@@ -14,7 +14,6 @@
         "vscode": {
             "extensions": [
                 "llvm-vs-code-extensions.vscode-clangd",
-                "donjayamanne.python-extension-pack",
                 "ms-vscode.cmake-tools",
                 "redhat.vscode-yaml",
                 "ranch-hand-robotics.rde-ros-2",
