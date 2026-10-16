@@ -1,0 +1,47 @@
+services:
+  ros:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        USERNAME: rosbot
+    privileged: true
+    network_mode: host
+    pid: host
+    ipc: host
+    command: sleep infinity
+    environment:
+      DISPLAY: ${DISPLAY:-}
+      XAUTHORITY: /tmp/.Xauthority
+      ROS_AUTOMATIC_DISCOVERY_RANGE: LOCALHOST
+      ROS_DOMAIN_ID: "42"
+    volumes:
+      - ../..:/home/rosbot/ws:cached
+      - ${XAUTHORITY:-/tmp/.Xauthority}:/tmp/.Xauthority
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - /dev:/dev
+
+  lichtblick:
+    image: ghcr.io/lichtblick-suite/lichtblick:latest
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+
+  lichtblick_client:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        USERNAME: rosbot
+    restart: always
+    network_mode: host
+    pid: host
+    ipc: host
+    command: ros2 run foxglove_bridge foxglove_bridge --port 8765
+    environment:
+      DISPLAY: ${DISPLAY:-}
+      XAUTHORITY: /tmp/.Xauthority
+      ROS_AUTOMATIC_DISCOVERY_RANGE: LOCALHOST
+      ROS_DOMAIN_ID: "42"
+    ports:
+      - "8765:8765"

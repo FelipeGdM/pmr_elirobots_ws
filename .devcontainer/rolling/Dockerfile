@@ -20,14 +20,31 @@ RUN echo "source /opt/ros/rolling/setup.bash" >> /home/$USERNAME/.bashrc
 
 RUN apt-get update && apt-get upgrade -y
 
-RUN apt-get install -y python3-pip \
+RUN apt-get update && apt-get install -y \
+    python3-pip \
     clangd \
     libboost-all-dev \
     gdb \
     ros-rolling-control-msgs \
+    ros-rolling-vision-msgs \
+    ros-rolling-cv-bridge \
+    ros-rolling-xacro \
+    ros-rolling-diagnostic-updater \
+    ros-rolling-image-pipeline \
+    ros-rolling-image-transport \
+    ros-rolling-camera-calibration \
+    ros-rolling-camera-info-manager \
+    ros-rolling-image-transport-plugins \
+    ros-rolling-diagnostic-updater \
+    ros-rolling-ffmpeg-image-transport-msgs \
+    ros-rolling-foxglove-msgs \
+    ros-rolling-rviz-imu-plugin \
+    ros-rolling-depth-image-proc \
+    ros-rolling-vision-msgs \
+    ros-rolling-cv-bridge \
     ros-rolling-trajectory-msgs 
 
-RUN python3 -m pip install --break-system-packages torch roboticstoolbox-python
+# RUN python3 -m pip install --break-system-packages torch roboticstoolbox-python
 
 ENV SHELL /bin/bash
 
