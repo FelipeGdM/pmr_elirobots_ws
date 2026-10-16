@@ -1,0 +1,14 @@
+# Spins depthai_ros_driver with the OAK pipeline configured in config/camera.yaml.
+#
+# The driver's own driver.launch.py is reused (composition, TF/URDF, start/stop
+# services); only the parameters file is overridden.
+launch:
+- arg:
+    name: "params_file"
+    default: "$(find-pkg-share pmr_elirobots_perception)/config/camera.yaml"
+    description: "depthai_ros_driver parameters file"
+- include:
+    file: "$(find-pkg-share depthai_ros_driver)/launch/driver.launch.py"
+    arg:
+    - name: "params_file"
+      value: "$(var params_file)"

@@ -1,0 +1,47 @@
+# depthai_ros_driver parameters.
+#
+# Reproduces the pipeline from src/autocalib/apriltag.py, except the AprilTag
+# node itself: depthai_ros_driver has no AprilTag support. Camera, stereo and
+# depth behavior match 1:1; tag detection needs a separate node (e.g.
+# apriltag_ros) consuming /oak/rgb/image_raw.
+#
+# Script references:
+#   hostCamera (CAM_A)  -> rgb
+#   monoLeft  (CAM_B)   -> left  (feeds stereo)
+#   monoRight (CAM_C)   -> right (feeds stereo)
+#   STEREO_IMAGE_SIZE = (1280, 800)
+#   COLOR_IMAGE_SIZE  = (1280, 800)
+/oak:
+  ros__parameters:
+    driver:
+      i_enable_ir: true
+
+    pipeline_gen:
+      i_pipeline_type: RGBD
+      i_enable_imu: false
+
+    rgb:
+      # hostCamera.requestOutput(COLOR_IMAGE_SIZE) = 1280x800
+      i_publish_topic: true
+      i_synced: true
+      i_width: 1280
+      i_height: 800
+      i_fps: 15.0
+
+    stereo:
+      # monoLeft/monoRight feed stereo at STEREO_IMAGE_SIZE (1280x800).
+      # setOutputSize(*COLOR_IMAGE_SIZE) -> 1280x800.
+      i_publish_topic: true
+      i_synced: true
+      i_width: 1280
+      i_height: 800
+      i_fps: 15.0
+      # setDefaultProfilePreset(PresetMode.DEFAULT)
+      i_depth_preset: DEFAULT
+      # setDepthAlign(CAM_A)
+      i_align_depth: true
+      i_board_socket_id: 0
+      # stereo.initialConfig.postProcessing.spatialFilter.enable = True
+      i_enable_spatial_filter: true
+      i_spatial_filter_hole_filling_radius: 2
+      i_extended_disp: false
