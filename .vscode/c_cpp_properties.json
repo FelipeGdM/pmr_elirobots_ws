@@ -14,7 +14,7 @@
             },
             "includePath": [
                 "/opt/ros/rolling/include/**",
-                "/home/ws/src/include/**",
+                "/home/rosbot/src/include/**",
                 "/usr/include/**"
             ],
             "name": "ros2",
